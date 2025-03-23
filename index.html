@@ -1,13 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <!-- Ensure responsiveness -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Whiteboard App</title>
-  </head>
-  <body>
-    <!-- React will mount here -->
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <!-- Ensure proper scaling on mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whiteboard App</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Toolbar with tool buttons, color and thickness controls, and extra features -->
+  <div class="toolbar">
+    <!-- Tool selection -->
+    <button id="pen-btn" title="Pen Tool">Pen</button>
+    <button id="eraser-btn" title="Eraser Tool">Eraser</button>
+    <button id="line-btn" title="Draw a Line">Line</button>
+    <button id="rect-btn" title="Draw a Rectangle">Rect</button>
+    <button id="circle-btn" title="Draw a Circle/Ellipse">Circle</button>
+    <button id="text-btn" title="Add Text">Text</button>
+
+    <!-- Color Picker and Stroke Thickness -->
+    <input type="color" id="color-picker" title="Choose Color" value="#000000" />
+    <input type="range" id="thickness" title="Stroke Thickness" min="1" max="50" value="2" />
+
+    <!-- Undo/Redo and Clear -->
+    <button id="undo-btn" title="Undo">Undo</button>
+    <button id="redo-btn" title="Redo">Redo</button>
+    <button id="clear-btn" title="Clear Canvas">Clear</button>
+    <button id="download-btn" title="Download as PNG">Download</button>
+
+    <!-- Extra Features -->
+    <button id="grid-toggle" title="Toggle Grid Background">Grid</button>
+    <button id="mode-toggle" title="Toggle Light/Dark Mode">Light/Dark</button>
+    <button id="zoom-in" title="Zoom In">Zoom +</button>
+    <button id="zoom-out" title="Zoom Out">Zoom -</button>
+  </div>
+
+  <!-- Canvas container to allow grid background and scaling -->
+  <div id="canvas-container">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="script.js"></script>
+</body>
 </html>
