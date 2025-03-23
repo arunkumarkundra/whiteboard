@@ -34,12 +34,14 @@ let undoStack = [];
 let redoStack = [];
 let scale = 1; // Zoom scale factor
 
-// Set canvas dimensions to fill container on load
+// Set canvas dimensions to create a virtually limitless board
 function resizeCanvas() {
-  canvas.width = container.clientWidth;
-  canvas.height = container.clientHeight;
-  // After resizing, you might want to restore the previous drawing state
-  // (This sample does not handle dynamic resizing to keep it simple.)
+  // Instead of matching container size, we set a huge canvas size.
+  canvas.width = 5000;
+  canvas.height = 5000;
+  // After setting the size, center the scroll position so that the user sees the middle of the board.
+  container.scrollLeft = (canvas.width - container.clientWidth) / 2;
+  container.scrollTop = (canvas.height - container.clientHeight) / 2;
 }
 resizeCanvas();
 
@@ -67,13 +69,42 @@ function getCanvasCoordinates(e) {
   return { x, y };
 }
 
-// Set current tool functions
-penBtn.addEventListener('click', () => { tool = 'pen'; });
-eraserBtn.addEventListener('click', () => { tool = 'eraser'; });
-lineBtn.addEventListener('click', () => { tool = 'line'; });
-rectBtn.addEventListener('click', () => { tool = 'rect'; });
-circleBtn.addEventListener('click', () => { tool = 'circle'; });
-textBtn.addEventListener('click', () => { tool = 'text'; });
+// Update active tool highlighting
+function updateActiveTool(selectedTool) {
+  const toolButtons = [penBtn, eraserBtn, lineBtn, rectBtn, circleBtn, textBtn];
+  toolButtons.forEach(button => button.classList.remove('active'));
+  switch(selectedTool) {
+    case 'pen':
+      penBtn.classList.add('active');
+      break;
+    case 'eraser':
+      eraserBtn.classList.add('active');
+      break;
+    case 'line':
+      lineBtn.classList.add('active');
+      break;
+    case 'rect':
+      rectBtn.classList.add('active');
+      break;
+    case 'circle':
+      circleBtn.classList.add('active');
+      break;
+    case 'text':
+      textBtn.classList.add('active');
+      break;
+  }
+}
+
+// Set current tool functions with active highlighting
+penBtn.addEventListener('click', () => { tool = 'pen'; updateActiveTool('pen'); });
+eraserBtn.addEventListener('click', () => { tool = 'eraser'; updateActiveTool('eraser'); });
+lineBtn.addEventListener('click', () => { tool = 'line'; updateActiveTool('line'); });
+rectBtn.addEventListener('click', () => { tool = 'rect'; updateActiveTool('rect'); });
+circleBtn.addEventListener('click', () => { tool = 'circle'; updateActiveTool('circle'); });
+textBtn.addEventListener('click', () => { tool = 'text'; updateActiveTool('text'); });
+
+// Set Pen as active by default on load
+updateActiveTool('pen');
 
 // Update color and thickness from controls
 colorPicker.addEventListener('change', (e) => {
@@ -180,8 +211,8 @@ function pointerMove(e) {
 function pointerUp(e) {
   if (!isDrawing) return;
   isDrawing = false;
-  // For pen/eraser, finish the path
-  if (tool === 'pen' || tool === 'eraser') {
+  // For pen, finish the path. (For eraser, the stroke is already applied during movement.)
+  if (tool === 'pen') {
     ctx.stroke();
   }
   saveState();
@@ -229,17 +260,67 @@ clearBtn.addEventListener('click', () => {
   saveState();
 });
 
-// Download canvas as PNG
-downloadBtn.addEventListener('click', () => {
+// New export function that crops blank areas while preserving transparency
+function exportCroppedImage() {
+  // Create an offscreen canvas and copy the current board without a background fill
+  const exportCanvas = document.createElement('canvas');
+  exportCanvas.width = canvas.width;
+  exportCanvas.height = canvas.height;
+  const exportCtx = exportCanvas.getContext('2d');
+  exportCtx.drawImage(canvas, 0, 0);
+
+  // Retrieve image data and determine the bounding box of non-transparent pixels
+  const imageData = exportCtx.getImageData(0, 0, exportCanvas.width, exportCanvas.height);
+  const data = imageData.data;
+  const w = exportCanvas.width;
+  const h = exportCanvas.height;
+  let minX = w, minY = h, maxX = 0, maxY = 0;
+  let found = false;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const index = (y * w + x) * 4;
+      // Check if the pixel has non-zero alpha
+      if (data[index + 3] > 0) {
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
+        found = true;
+      }
+    }
+  }
+
+  // If no drawn pixels are found, export a minimal image.
+  if (!found) {
+    minX = 0;
+    minY = 0;
+    maxX = 1;
+    maxY = 1;
+  }
+
+  const cropWidth = maxX - minX + 1;
+  const cropHeight = maxY - minY + 1;
+  const croppedCanvas = document.createElement('canvas');
+  croppedCanvas.width = cropWidth;
+  croppedCanvas.height = cropHeight;
+  const croppedCtx = croppedCanvas.getContext('2d');
+  croppedCtx.drawImage(exportCanvas, minX, minY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+  const croppedDataURL = croppedCanvas.toDataURL();
   const link = document.createElement('a');
   link.download = 'whiteboard.png';
-  link.href = canvas.toDataURL();
+  link.href = croppedDataURL;
   link.click();
+}
+
+// Updated download button event to export only the cropped area with transparency
+downloadBtn.addEventListener('click', () => {
+  exportCroppedImage();
 });
 
-// Toggle grid background on the container
+// Toggle grid background: now toggles grid on the canvas element
 gridToggle.addEventListener('click', () => {
-  container.classList.toggle('grid');
+  canvas.classList.toggle('grid');
 });
 
 // Toggle light/dark mode by toggling a class on the body
