@@ -1,4 +1,4 @@
-/* Reset margins and set full height */
+/* Global resets */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,20 +9,7 @@ html, body {
   height: 100%;
 }
 
-/* Light theme (default) */
-body {
-  background-color: #f5f5f5;
-  color: #333;
-  font-family: Arial, sans-serif;
-}
-
-/* Dark theme */
-body.dark {
-  background-color: #222;
-  color: #ddd;
-}
-
-/* Toolbar styling */
+/* Toolbar styling remains unchanged */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -43,35 +30,55 @@ body.dark .toolbar {
   font-size: 14px;
 }
 
-/* Canvas container fills the remaining space */
+/* Highlight active tool button */
+.toolbar button.active {
+  background-color: #ddd;
+  border: 2px solid #555;
+}
+
+body.dark .toolbar button.active {
+  background-color: #555;
+  border: 2px solid #aaa;
+}
+
+/* Container occupies full available viewport and is scrollable */
 #canvas-container {
   position: relative;
   flex-grow: 1;
   height: calc(100% - 60px); /* Adjust if toolbar height changes */
   overflow: auto;
-  /* Optional grid background; initially off */
   background-color: transparent;
 }
 
-/* Grid background applied when .grid class is toggled */
-#canvas-container.grid {
-  background-image:
-    linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1) 76%, transparent 77%, transparent),
-    linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1) 76%, transparent 77%, transparent);
-  background-size: 25px 25px;
+/* Define CSS variables for canvas background and grid colors */
+:root {
+  --canvas-bg: #fff;
+  --grid-color: rgba(0, 0, 0, 0.1);
 }
 
-/* Canvas styling */
+body.dark {
+  --canvas-bg: #222;
+  --grid-color: rgba(255, 255, 255, 0.1);
+}
+
+/* The canvas is huge and uses a background color based on the current theme */
 #canvas {
-  border: 1px solid #ccc;
-  touch-action: none; /* Prevent scrolling on touch devices */
   display: block;
-  margin: 0 auto;
-  /* Enable smooth scaling via CSS transform */
+  background-color: var(--canvas-bg);
   transform-origin: 0 0;
 }
 
-/* Responsive layout */
+/* Grid background applied when .grid class is toggled on the canvas.
+   The grid uses the theme-specific grid color.
+*/
+#canvas.grid {
+  background-image:
+    linear-gradient(0deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent);
+  background-size: 25px 25px;
+}
+
+/* Responsive layout for smaller screens */
 @media (max-width: 600px) {
   .toolbar {
     font-size: 12px;
