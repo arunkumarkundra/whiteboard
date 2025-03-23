@@ -1,0 +1,83 @@
+/* Reset margins and set full height */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+/* Light theme (default) */
+body {
+  background-color: #f5f5f5;
+  color: #333;
+  font-family: Arial, sans-serif;
+}
+
+/* Dark theme */
+body.dark {
+  background-color: #222;
+  color: #ddd;
+}
+
+/* Toolbar styling */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px;
+  background: #eee;
+  border-bottom: 1px solid #ccc;
+}
+
+body.dark .toolbar {
+  background: #333;
+  border-bottom: 1px solid #555;
+}
+
+.toolbar button,
+.toolbar input {
+  margin: 5px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+/* Canvas container fills the remaining space */
+#canvas-container {
+  position: relative;
+  flex-grow: 1;
+  height: calc(100% - 60px); /* Adjust if toolbar height changes */
+  overflow: auto;
+  /* Optional grid background; initially off */
+  background-color: transparent;
+}
+
+/* Grid background applied when .grid class is toggled */
+#canvas-container.grid {
+  background-image:
+    linear-gradient(0deg, transparent 24%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.1) 26%, transparent 27%, transparent 74%, rgba(0,0,0,0.1) 75%, rgba(0,0,0,0.1) 76%, transparent 77%, transparent);
+  background-size: 25px 25px;
+}
+
+/* Canvas styling */
+#canvas {
+  border: 1px solid #ccc;
+  touch-action: none; /* Prevent scrolling on touch devices */
+  display: block;
+  margin: 0 auto;
+  /* Enable smooth scaling via CSS transform */
+  transform-origin: 0 0;
+}
+
+/* Responsive layout */
+@media (max-width: 600px) {
+  .toolbar {
+    font-size: 12px;
+  }
+  .toolbar button,
+  .toolbar input {
+    padding: 6px 10px;
+  }
+}
