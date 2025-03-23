@@ -1,45 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <!-- Ensure proper scaling on mobile devices -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Whiteboard App</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiteboard App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <!-- Toolbar with tool buttons, color and thickness controls, and extra features -->
-  <div class="toolbar">
-    <!-- Tool selection -->
-    <button id="pen-btn" title="Pen Tool">Pen</button>
-    <button id="eraser-btn" title="Eraser Tool">Eraser</button>
-    <button id="line-btn" title="Draw a Line">Line</button>
-    <button id="rect-btn" title="Draw a Rectangle">Rect</button>
-    <button id="circle-btn" title="Draw a Circle/Ellipse">Circle</button>
-    <button id="text-btn" title="Add Text">Text</button>
+    <div class="container" id="container">
+        <div class="toolbar" id="toolbar">
+            <div class="toolbar-section tools">
+                <button class="tool-btn" id="penTool" title="Pen Tool (P)">
+                    <i class="fas fa-pen"></i>
+                </button>
+                <button class="tool-btn" id="lineTool" title="Line Tool (L)">
+                    <i class="fas fa-slash"></i>
+                </button>
+                <button class="tool-btn" id="arrowTool" title="Arrow Tool (A)">
+                    <i class="fas fa-long-arrow-alt-right"></i>
+                </button>
+                <button class="tool-btn" id="rectangleTool" title="Rectangle Tool (R)">
+                    <i class="far fa-square"></i>
+                </button>
+                <button class="tool-btn" id="circleTool" title="Circle Tool (C)">
+                    <i class="far fa-circle"></i>
+                </button>
+                <button class="tool-btn" id="textTool" title="Text Tool (T)">
+                    <i class="fas fa-font"></i>
+                </button>
+                <button class="tool-btn" id="eraserTool" title="Eraser Tool (E)">
+                    <i class="fas fa-eraser"></i>
+                </button>
+            </div>
 
-    <!-- Color Picker and Stroke Thickness -->
-    <input type="color" id="color-picker" title="Choose Color" value="#000000" />
-    <input type="range" id="thickness" title="Stroke Thickness" min="1" max="50" value="2" />
+            <div class="toolbar-section properties">
+                <div class="color-picker-container">
+                    <input type="color" id="colorPicker" value="#000000" title="Color Picker">
+                    <span class="color-indicator"></span>
+                </div>
+                <div class="stroke-width-container">
+                    <button class="stroke-btn" id="strokeBtn" title="Stroke Width">
+                        <i class="fas fa-paint-brush"></i>
+                    </button>
+                    <div class="stroke-dropdown" id="strokeDropdown">
+                        <input type="range" id="strokeWidth" min="1" max="50" value="5">
+                        <span id="strokeWidthValue">5px</span>
+                    </div>
+                </div>
+            </div>
 
-    <!-- Undo/Redo and Clear -->
-    <button id="undo-btn" title="Undo">Undo</button>
-    <button id="redo-btn" title="Redo">Redo</button>
-    <button id="clear-btn" title="Clear Canvas">Clear</button>
-    <button id="download-btn" title="Download as PNG">Download</button>
+            <div class="toolbar-section actions">
+                <button class="action-btn" id="undoBtn" title="Undo (Ctrl+Z)">
+                    <i class="fas fa-undo"></i>
+                </button>
+                <button class="action-btn" id="redoBtn" title="Redo (Ctrl+Y)">
+                    <i class="fas fa-redo"></i>
+                </button>
+                <button class="action-btn" id="resetBtn" title="Reset Canvas">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button class="action-btn" id="gridBtn" title="Toggle Grid">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button class="action-btn" id="themeBtn" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="action-btn" id="zoomInBtn" title="Zoom In (+)">
+                    <i class="fas fa-search-plus"></i>
+                </button>
+                <button class="action-btn" id="zoomOutBtn" title="Zoom Out (-)">
+                    <i class="fas fa-search-minus"></i>
+                </button>
+                <button class="action-btn" id="downloadBtn" title="Download Canvas">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+        </div>
 
-    <!-- Extra Features -->
-    <button id="grid-toggle" title="Toggle Grid Background">Grid</button>
-    <button id="mode-toggle" title="Toggle Light/Dark Mode">Light/Dark</button>
-    <button id="zoom-in" title="Zoom In">Zoom +</button>
-    <button id="zoom-out" title="Zoom Out">Zoom -</button>
-  </div>
-
-  <!-- Canvas container to allow grid background and scaling -->
-  <div id="canvas-container">
+<div class="canvas-container" id="canvasContainer">
     <canvas id="canvas"></canvas>
-  </div>
+    <canvas id="gridCanvas"></canvas>
+    <div id="textInputContainer" class="text-input-container">
+        <textarea id="textInput"></textarea>
+        <!-- Button will be added here dynamically -->
+    </div>
+</div>
 
-  <script src="script.js"></script>
+<script>
+// JavaScript should be in a script tag or external file
+const textInputContainer = document.getElementById('textInputContainer');
+if (!document.getElementById('textSaveBtn')) {
+    const saveBtn = document.createElement('button');
+    saveBtn.id = 'textSaveBtn';
+    saveBtn.innerHTML = '<i class="fas fa-check"></i>'; // Checkmark icon using FontAwesome
+    saveBtn.className = 'text-save-btn';
+    textInputContainer.appendChild(saveBtn);
+}
+</script>
+
+
+        <div class="status-bar" id="statusBar">
+            <div class="coordinates">
+                <span id="mousePosition">X: 0, Y: 0</span>
+            </div>
+            <div class="zoom-level">
+                <span id="zoomLevel">Zoom: 100%</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
