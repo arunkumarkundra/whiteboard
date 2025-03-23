@@ -1,90 +1,251 @@
-/* Global resets */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body {
-  height: 100%;
-}
-
-/* Toolbar styling remains unchanged */
-.toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 10px;
-  background: #eee;
-  border-bottom: 1px solid #ccc;
-}
-
-body.dark .toolbar {
-  background: #333;
-  border-bottom: 1px solid #555;
-}
-
-.toolbar button,
-.toolbar input {
-  margin: 5px;
-  padding: 8px 12px;
-  font-size: 14px;
-}
-
-/* Highlight active tool button */
-.toolbar button.active {
-  background-color: #ddd;
-  border: 2px solid #555;
-}
-
-body.dark .toolbar button.active {
-  background-color: #555;
-  border: 2px solid #aaa;
-}
-
-/* Container occupies full available viewport and is scrollable */
-#canvas-container {
-  position: relative;
-  flex-grow: 1;
-  height: calc(100% - 60px); /* Adjust if toolbar height changes */
-  overflow: auto;
-  background-color: transparent;
-}
-
-/* Define CSS variables for canvas background and grid colors */
 :root {
-  --canvas-bg: #fff;
-  --grid-color: rgba(0, 0, 0, 0.1);
+    --primary-color: #3498db;
+    --hover-color: #2980b9;
+    --bg-color: #f5f5f5;
+    --toolbar-bg: #ffffff;
+    --text-color: #333333;
+    --border-color: #dddddd;
+    --canvas-bg: #ffffff;
+    --grid-color: rgba(0, 0, 0, 0.1);
 }
 
-body.dark {
-  --canvas-bg: #222;
-  --grid-color: rgba(255, 255, 255, 0.1);
+.dark-theme {
+    --primary-color: #3498db;
+    --hover-color: #2980b9;
+    --bg-color: #1e1e1e;
+    --toolbar-bg: #2d2d2d;
+    --text-color: #f5f5f5;
+    --border-color: #444444;
+    --canvas-bg: #2d2d2d;
+    --grid-color: rgba(255, 255, 255, 0.1);
 }
 
-/* The canvas is huge and uses a background color based on the current theme */
-#canvas {
-  display: block;
-  background-color: var(--canvas-bg);
-  transform-origin: 0 0;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Grid background applied when .grid class is toggled on the canvas.
-   The grid uses the theme-specific grid color.
-*/
-#canvas.grid {
-  background-image:
-    linear-gradient(0deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent),
-    linear-gradient(90deg, transparent 24%, var(--grid-color) 25%, var(--grid-color) 26%, transparent 27%, transparent 74%, var(--grid-color) 75%, var(--grid-color) 76%, transparent 77%, transparent);
-  background-size: 25px 25px;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.3s, color 0.3s;
+    overflow: hidden;
+    height: 100vh;
+    touch-action: none;
 }
 
-/* Responsive layout for smaller screens */
-@media (max-width: 600px) {
-  .toolbar {
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    position: relative;
+}
+
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background-color: var(--toolbar-bg);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    transition: background-color 0.3s;
+}
+
+.toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tool-btn, .action-btn {
+    background: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.tool-btn:hover, .action-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.tool-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.dark-theme .tool-btn:hover, 
+.dark-theme .action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.color-picker-container {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+#colorPicker {
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.color-indicator {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #000000;
+    border: 1px solid #ccc;
+    pointer-events: none;
+}
+
+.stroke-width-container {
+    position: relative;
+}
+
+.stroke-btn {
+    background: none;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+}
+
+.stroke-dropdown {
+    position: absolute;
+    top: 45px;
+    left: 0;
+    background-color: var(--toolbar-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 8px;
+    width: 200px;
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 200;
+}
+
+.stroke-dropdown.active {
+    display: flex;
+}
+
+#strokeWidth {
+    width: 100%;
+}
+
+.canvas-container {
+    flex: 1;
+    position: relative;
+    overflow: auto; /* Changed from 'overflow: auto' to enable scrollbars */
+    background-color: var(--canvas-bg);
+    transition: background-color 0.3s;
+}
+
+#canvas, #gridCanvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5000px; /* Changed from dynamic sizing to a large fixed size */
+    height: 5000px; /* Changed from dynamic sizing to a large fixed size */
+    touch-action: none;
+}
+
+#gridCanvas {
+    pointer-events: none;
+}
+
+.text-input-container {
+    position: absolute;
+    display: none;
+    z-index: 150;
+}
+
+#textInput {
+    border: 1px dashed var(--primary-color);
+    background-color: transparent;
+    padding: 5px;
+    min-width: 50px;
+    min-height: 24px;
+    outline: none;
+    resize: both;
+    overflow: auto;
+    font-family: inherit;
+    color: var(--text-color);
+}
+
+.status-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 16px;
+    background-color: var(--toolbar-bg);
+    border-top: 1px solid var(--border-color);
     font-size: 12px;
-  }
-  .toolbar button,
-  .toolbar input {
-    padding: 6px 10px;
-  }
+    transition: background-color 0.3s;
+}
+
+@media (max-width: 768px) {
+    .toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .toolbar-section {
+        flex-wrap: wrap;
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+    }
+}
+
+
+.text-save-btn {
+    position: absolute;
+    right: -30px;
+    top: 0;
+    width: 24px;
+    height: 24px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.text-save-btn:hover {
+    background-color: #45a049;
 }
